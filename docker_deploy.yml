@@ -1,23 +1,26 @@
 ---
-- name: Deploy Apache Docker Container
+- name: Deploy Apache in Docker Container
   hosts: localhost
+  become: yes
   tasks:
-    - name: Run Apache Docker container
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+
+    - name: Pull Apache Docker image
+      docker_image:
+        name: httpd:latest
+
+    - name: Run Apache container
       docker_container:
-        name: apache_container
+        name: my_apache_container
         image: httpd:latest
         ports:
           - "80:80"
-        networks:
-          - name: apache_network
-            ipam_config:
-              - subnet: "172.168.10.0/30"
-    - name: Ensure Apache service is running
-      service:
-        name: httpd
         state: started
-  handlers:
-    - name: restart Apache
-      service:
-        name: httpd
-        state: restarted
