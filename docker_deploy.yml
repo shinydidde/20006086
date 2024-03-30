@@ -1,7 +1,17 @@
 ---
 - name: Deploy Apache Docker Container
   hosts: localhost
+  connection: local
+  gather_facts: no
+
   tasks:
+    - name: Create Docker network
+      docker_network:
+        name: my_network
+        driver: bridge
+        ipam_config:
+          - subnet: 172.168.10.0/30
+
     - name: Pull Apache Docker image
       docker_image:
         name: httpd
@@ -11,7 +21,9 @@
     - name: Run Docker container
       docker_container:
         name: apache
-        image: httpd:latest
+        image: httpd
         state: started
+        networks:
+          - name: my_network
         ports:
           - "80:80"
