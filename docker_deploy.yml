@@ -18,12 +18,26 @@
         source: pull
         state: present
 
-    - name: Run Docker container
+    - name: Creating a Persistent Volume Dir
+      file:
+        path: "/Users/mruduladidde/md"
+        state: directory
+
+    - name: Copying the HTML code in the Directory
+      copy:
+        src: "/Users/mruduladidde/Desktop/CA1/"
+        dest: "/Users/mruduladidde/md"
+
+    - name: Launching an HTTPD Container
       docker_container:
         name: apache
         image: httpd
         state: started
         networks:
           - name: my_network
+        exposed_ports:
+          - "80"
         ports:
-          - "80:80"
+          - "8888:80"
+        volumes:
+          - /Users/mruduladidde/md:/usr/local/apache2/htdocs
